@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radmin Call | Download</title>
+
+<style>
+:root {
+    --bg: #0a0a0a;
+    --card: #161616;
+    --accent: #00ff88;
+    --text: #ffffff;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.header p {
+    color: var(--accent);
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.version-card {
+    background: var(--card);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.version-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.info .date {
+    font-size: 0.7rem;
+    color: #777;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.info .v-num {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.download-btn {
+    background: var(--accent);
+    color: #000;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.empty-message {
+    text-align: center;
+    color: #555;
+    margin-top: 50px;
+}
+
+/* ADMIN */
+.delete-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+#admin-panel {
+    display: none;
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 20px;
+}
+
+/* MODAL */
+#loginModal {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.8);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box {
+    background: var(--card);
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>RADMIN CALL</h1>
+    <p>for Windows</p>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+    <div class="version-card" style="flex-direction:column; gap:10px;">
+        <input type="text" id="verInput" placeholder="Версия">
+        <input type="file" id="fileInput">
+        <button onclick="addVersion()" class="download-btn">Опубликовать</button>
+        <button onclick="logout()" style="background:#444; color:white; border:none; padding:10px; border-radius:8px;">Выйти</button>
+    </div>
+</div>
+
+<div class="container" id="app"></div>
+
+<!-- LOGIN BUTTON -->
+<button id="login-btn" onclick="openLogin()" style="opacity:0.2; background:none; border:none; color:white; margin-top:50px;">
+    🔐
+</button>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal">
+    <div class="modal-box">
+        <h3>Вход в админку</h3>
+        <input type="password" id="password" placeholder="Пароль" style="padding:10px; width:100%; margin-bottom:10px;">
+        <br>
+        <button onclick="checkLogin()" class="download-btn">Войти</button>
+    </div>
+</div>
+
+<script>
+let isAdmin = false;
+let versions = [];
+
+function openLogin() {
+    document.getElementById('loginModal').style.display = 'flex';
+}
+
+function checkLogin() {
+    const pass = document.getElementById('password').value;
+
+    if (pass === "1234") {
+        isAdmin = true;
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('login-btn').style.display = 'none';
+        document.getElementById('loginModal').style.display = 'none';
+        render();
+    } else {
+        alert("Неверный пароль");
+    }
+}
+
+function logout() {
+    isAdmin = false;
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('login-btn').style.display = 'block';
+    render();
+}
+
+function addVersion() {
+    const v = document.getElementById('verInput').value;
+    const file = document.getElementById('fileInput').files[0];
+
+    if (!v || !file) {
+        alert("Заполни всё");
+        return;
+    }
+
+    const url = URL.createObjectURL(file);
+
+    versions.unshift({
+        id: Date.now(),
+        v: v,
+        date: new Date().toLocaleDateString(),
+        link: url,
+        name: file.name
+    });
+
+    render();
+}
+
+function deleteVersion(id) {
+    if(confirm("Удалить версию?")) {
+        versions = versions.filter(item => item.id !== id);
+        render();
+    }
+}
+
+function render() {
+    const container = document.getElementById('app');
+
+    if (versions.length === 0) {
+        container.innerHTML = '<div class="empty-message">Пока нет доступных версий для скачивания.</div>';
+        return;
+    }
+
+    container.innerHTML = versions.map(item => `
+        <div class="version-card">
+            <div class="info">
+                <span class="date">Опубликовано: ${item.date}</span>
+                <span class="v-num">Версия: ${item.v}</span>
+                ${isAdmin ? `<button class="delete-btn" onclick="deleteVersion(${item.id})">Удалить</button>` : ''}
+            </div>
+            <a href="${item.link}" download="${item.name}" class="download-btn">Скачать</a>
+        </div>
+    `).join('');
+}
+
+render();
+</script>
+
+</body>
+</html>
