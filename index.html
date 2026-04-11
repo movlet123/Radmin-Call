@@ -76,6 +76,11 @@ body {
     font-weight: bold;
 }
 
+.file-name {
+    font-size: 0.8rem;
+    color: #999;
+}
+
 .download-btn {
     background: var(--accent);
     color: #000;
@@ -92,43 +97,6 @@ body {
     color: #555;
     margin-top: 50px;
 }
-
-/* ADMIN */
-.delete-btn {
-    background: #ff4444;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-    cursor: pointer;
-}
-
-#admin-panel {
-    display: none;
-    width: 100%;
-    max-width: 500px;
-    margin-bottom: 20px;
-}
-
-/* MODAL */
-#loginModal {
-    display: none;
-    position: fixed;
-    top:0; left:0;
-    width:100%;
-    height:100%;
-    background: rgba(0,0,0,0.8);
-    justify-content:center;
-    align-items:center;
-}
-
-.modal-box {
-    background: var(--card);
-    padding:20px;
-    border-radius:10px;
-    text-align:center;
-}
 </style>
 </head>
 
@@ -139,112 +107,60 @@ body {
     <p>for Windows</p>
 </div>
 
-<!-- ADMIN PANEL -->
-<div id="admin-panel">
-    <div class="version-card" style="flex-direction:column; gap:10px;">
-        <input type="text" id="verInput" placeholder="Версия">
-        <input type="file" id="fileInput">
-        <button onclick="addVersion()" class="download-btn">Опубликовать</button>
-        <button onclick="logout()" style="background:#444; color:white; border:none; padding:10px; border-radius:8px;">Выйти</button>
-    </div>
-</div>
-
-<div class="container" id="app"></div>
-
-<!-- LOGIN BUTTON -->
-<button id="login-btn" onclick="openLogin()" style="opacity:0.2; background:none; border:none; color:white; margin-top:50px;">
-    🔐
-</button>
-
-<!-- LOGIN MODAL -->
-<div id="loginModal">
-    <div class="modal-box">
-        <h3>Вход в админку</h3>
-        <input type="password" id="password" placeholder="Пароль" style="padding:10px; width:100%; margin-bottom:10px;">
-        <br>
-        <button onclick="checkLogin()" class="download-btn">Войти</button>
-    </div>
+<div class="container" id="app">
+    <div class="empty-message">Загрузка...</div>
 </div>
 
 <script>
-let isAdmin = false;
-let versions = [];
+const USER = "USERNAME"; // ← сюда ник
+const REPO = "REPO";     // ← сюда репо
 
-function openLogin() {
-    document.getElementById('loginModal').style.display = 'flex';
-}
-
-function checkLogin() {
-    const pass = document.getElementById('password').value;
-
-    if (pass === "1234") {
-        isAdmin = true;
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('login-btn').style.display = 'none';
-        document.getElementById('loginModal').style.display = 'none';
-        render();
-    } else {
-        alert("Неверный пароль");
-    }
-}
-
-function logout() {
-    isAdmin = false;
-    document.getElementById('admin-panel').style.display = 'none';
-    document.getElementById('login-btn').style.display = 'block';
-    render();
-}
-
-function addVersion() {
-    const v = document.getElementById('verInput').value;
-    const file = document.getElementById('fileInput').files[0];
-
-    if (!v || !file) {
-        alert("Заполни всё");
-        return;
-    }
-
-    const url = URL.createObjectURL(file);
-
-    versions.unshift({
-        id: Date.now(),
-        v: v,
-        date: new Date().toLocaleDateString(),
-        link: url,
-        name: file.name
-    });
-
-    render();
-}
-
-function deleteVersion(id) {
-    if(confirm("Удалить версию?")) {
-        versions = versions.filter(item => item.id !== id);
-        render();
-    }
-}
-
-function render() {
+async function loadVersions() {
     const container = document.getElementById('app');
 
-    if (versions.length === 0) {
-        container.innerHTML = '<div class="empty-message">Пока нет доступных версий для скачивания.</div>';
-        return;
-    }
+    try {
+        const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases`);
+        const data = await res.json();
 
-    container.innerHTML = versions.map(item => `
-        <div class="version-card">
-            <div class="info">
-                <span class="date">Опубликовано: ${item.date}</span>
-                <span class="v-num">Версия: ${item.v}</span>
-                ${isAdmin ? `<button class="delete-btn" onclick="deleteVersion(${item.id})">Удалить</button>` : ''}
+        if (!data.length) {
+            container.innerHTML = '<div class="empty-message">Нет релизов</div>';
+            return;
+        }
+
+        const versions = data.map(release => {
+
+            // 🔍 ищем ZIP файл
+            const zipFile = release.assets.find(a => a.name.endsWith(".zip"));
+
+            return {
+                v: release.tag_name,
+                date: new Date(release.published_at).toLocaleDateString(),
+                link: zipFile ? zipFile.browser_download_url : null,
+                name: zipFile ? zipFile.name : "Нет ZIP файла"
+            };
+        });
+
+        container.innerHTML = versions.map(item => `
+            <div class="version-card">
+                <div class="info">
+                    <span class="date">Опубликовано: ${item.date}</span>
+                    <span class="v-num">Версия: ${item.v}</span>
+                    <span class="file-name">${item.name}</span>
+                </div>
+                ${
+                    item.link 
+                    ? `<a href="${item.link}" class="download-btn">Скачать</a>`
+                    : `<span style="color:red;">Нет файла</span>`
+                }
             </div>
-            <a href="${item.link}" download="${item.name}" class="download-btn">Скачать</a>
-        </div>
-    `).join('');
+        `).join('');
+
+    } catch (e) {
+        container.innerHTML = '<div class="empty-message">Ошибка загрузки</div>';
+    }
 }
 
-render();
+loadVersions();
 </script>
 
 </body>
