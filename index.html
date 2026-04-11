@@ -86,27 +86,10 @@
             text-transform: uppercase;
         }
 
-        .admin-panel {
+        .empty-message {
+            text-align: center;
+            color: #555;
             margin-top: 50px;
-            padding: 15px;
-            background: #111;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            border: none;
-        }
-
-        button {
-            background: #333;
-            color: white;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -120,22 +103,23 @@
     <div class="container" id="app">
         </div>
 
-    <div class="admin-panel">
-        <h3 style="text-align:center">Админ-панель</h3>
-        <input type="text" id="verInput" placeholder="Версия (0.0.1)">
-        <input type="text" id="linkInput" placeholder="Ссылка на файл">
-        <button onclick="addVersion()">Опубликовать</button>
-    </div>
-
     <script>
-        // Функция для отображения (имитация работы с базой)
+        // ТВОЯ БАЗА ДАННЫХ
+        // Чтобы выложить программу, просто добавь строчку в этот список:
         let versions = [
-            {v: "0.0.3", date: "19 Ноября 2026, 18:30", link: "#"},
-            {v: "0.0.2", date: "Октябрь 2026, 15:30", link: "#"}
+            // Пример: {v: "1.0.0", date: "12 Апреля 2026", link: "ССЫЛКА_НА_ФАЙЛ"},
         ];
 
         function render() {
             const container = document.getElementById('app');
+            
+            // Если версий нет, показываем сообщение
+            if (versions.length === 0) {
+                container.innerHTML = '<div class="empty-message">Пока нет доступных версий для скачивания.</div>';
+                return;
+            }
+
+            // Если версии есть, рисуем карточки
             container.innerHTML = versions.map(item => `
                 <div class="version-card">
                     <div class="info">
@@ -147,21 +131,7 @@
             `).join('');
         }
 
-        function addVersion() {
-            const v = document.getElementById('verInput').value;
-            const link = document.getElementById('linkInput').value;
-            const now = new Date();
-            const dateStr = now.toLocaleString('ru-RU');
-
-            if(v && link) {
-                versions.unshift({v: v, date: dateStr, link: link});
-                render();
-                alert('Версия добавлена! (Пока только в браузере)');
-            }
-        }
-
         render();
     </script>
 </body>
 </html>
-
