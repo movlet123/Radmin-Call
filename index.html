@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radmin Call</title>
+
+<style>
+body {
+    background:#0a0a0a;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.card {
+    background:#161616;
+    margin:10px auto;
+    padding:15px;
+    border-radius:10px;
+    max-width:400px;
+}
+
+a {
+    background:#00ff88;
+    color:black;
+    padding:10px;
+    display:inline-block;
+    border-radius:8px;
+    text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<h1>RADMIN CALL</h1>
+<p>Downloads</p>
+
+<div id="app">Загрузка...</div>
+
+<script>
+const USER = "movlet123";
+const REPO = "Radmin-Call";
+
+async function load() {
+    const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases`);
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(r => {
+        const zip = r.assets.find(a => a.name.endsWith(".zip"));
+
+        html += `
+        <div class="card">
+            <h3>${r.tag_name}</h3>
+            <p>${new Date(r.published_at).toLocaleDateString()}</p>
+            ${zip ? `<a href="${zip.browser_download_url}">Скачать ZIP</a>` : "Нет файла"}
+        </div>
+        `;
+    });
+
+    document.getElementById("app").innerHTML = html;
+}
+
+load();
+</script>
+
+</body>
+</html>
