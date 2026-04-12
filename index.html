@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<link rel="icon" href="logo.png" type="image/png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radmin Call</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+body {
+    background: #0a0a0a;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.header {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.logo {
+    width: 90px;
+    margin-bottom: 10px;
+}
+
+.header h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.header p {
+    color: #00ff88;
+    font-weight: 700;
+}
+
+#app {
+    width: 100%;
+    max-width: 550px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.card {
+    background: #161616;
+    padding: 20px 25px;
+    border-radius: 12px;
+    border: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    border-color: #00ff88;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.card-date {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.download-btn {
+    background: #00ff88;
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.no-file {
+    color: #555;
+}
+
+.loading {
+    color: #888;
+    text-align: center;
+}
+
+.footer {
+    margin-top: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #888;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #111;
+    transition: 0.3s;
+}
+
+.social-link img {
+    width: 20px;
+    height: 20px;
+}
+
+.social-link:hover {
+    color: #00ff88;
+    border-color: #00ff88;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <img src="logo.png" class="logo">
+    <h1>RADMIN CALL</h1>
+    <p>for Windows</p>
+</div>
+
+<div id="app" class="loading">Загрузка...</div>
+
+<div class="footer">
+    <a href="https://www.youtube.com/@S-M-U-C-K" target="_blank" class="social-link">
+        <img src="youtube.png"> YouTube
+    </a>
+    <a href="https://github.com/movlet123" target="_blank" class="social-link">
+        <img src="github.png"> GitHub
+    </a>
+    <a href="https://www.tiktok.com/@mobeha_rbx" target="_blank" class="social-link">
+        <img src="tiktok.png"> TikTok
+    </a>
+</div>
+
+<script>
+const USER = "movlet123";
+const REPO = "Radmin-Call";
+
+async function load() {
+    const app = document.getElementById("app");
+
+    try {
+        const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases`);
+
+        // ❗ если API не ответил нормально
+        if (!res.ok) {
+            throw new Error("API error");
+        }
+
+        const data = await res.json();
+
+        // ❗ если GitHub вернул не массив (например лимит)
+        if (!Array.isArray(data)) {
+            app.innerHTML = "<div class='loading'>Ошибка API (лимит GitHub)</div>";
+            return;
+        }
+
+        // ❗ если релизов нет
+        if (data.length === 0) {
+            app.innerHTML = "<div class='loading'>Релизов пока нет</div>";
+            return;
+        }
+
+        let html = "";
+
+        data.forEach(r => {
+            const zip = r.assets.find(a => a.name.endsWith(".zip"));
+
+            html += `
+            <div class="card">
+                <div>
+                    <div class="card-date">${new Date(r.published_at).toLocaleDateString()}</div>
+                    <div class="card-title">${r.tag_name}</div>
+                </div>
+                ${zip 
+                    ? `<a href="${zip.browser_download_url}" class="download-btn">Скачать</a>` 
+                    : `<div class="no-file">Нет файла</div>`
+                }
+            </div>
+            `;
+        });
+
+        app.innerHTML = html;
+
+    } catch (err) {
+        console.error(err);
+
+        app.innerHTML = `
+        <div class="loading">
+            Ошибка загрузки 😢<br>
+            Попробуй обновить страницу позже
+        </div>
+        `;
+    }
+}
+
+// небольшая задержка (фикс для ПК)
+setTimeout(load, 300);
+</script>
+
+</body>
+</html>
