@@ -1,4 +1,4 @@
-﻿const USER = "movlet123";
+const USER = "movlet123";
 const REPO = "Radmin-Call";
 
 let allReleases = [];
