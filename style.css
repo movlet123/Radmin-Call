@@ -49,6 +49,10 @@ body.light .header p {
     gap: 15px;
 }
 
+#app {
+    text-align: center;
+}
+
 .card {
     position: relative;
     background: #161616;
