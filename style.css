@@ -161,7 +161,11 @@ body.light .toggle-btn:hover {
 .social-link {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+
+    width: 130px;
+    
     color: #888;
     text-decoration: none;
     padding: 10px 15px;
