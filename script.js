@@ -28,14 +28,20 @@ toggleBtn.onclick = () => {
 function render() {
     const app = document.getElementById("app");
 
+    // ✅ ВАЖНО: 4 по умолчанию
     const visible = expanded ? allReleases : allReleases.slice(0, 4);
 
     let html = "";
 
     visible.forEach((r, i) => {
-        const zip = r.assets.find(a => a.name.endsWith(".zip"));
-        const isLast = (!expanded && i === visible.length - 1);
-        const cls = isLast ? "card fade" : "card";
+        const zip = r.assets?.find(a => a.name.endsWith(".zip"));
+
+        const isLastHidden =
+            !expanded &&
+            i === visible.length - 1 &&
+            allReleases.length > 4;
+
+        const cls = isLastHidden ? "card fade" : "card";
 
         html += `
         <div class="${cls}">
@@ -51,6 +57,7 @@ function render() {
         `;
     });
 
+    // ✅ КНОПКА РАЗВЕРНУТЬ / ЗАКРЫТЬ
     if (allReleases.length > 4) {
         html += `
         <div class="toggle-btn" onclick="toggle()">
@@ -68,13 +75,18 @@ function toggle() {
 }
 
 async function load() {
-    const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases?per_page=10`);
-    const data = await res.json();
+    try {
+        const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/releases?per_page=100`);
+        const data = await res.json();
 
-    if (!Array.isArray(data) || data.length === 0) return;
+        if (!Array.isArray(data)) return;
 
-    allReleases = data;
-    render();
+        allReleases = data;
+        render();
+    } catch (e) {
+        console.error(e);
+        document.getElementById("app").innerHTML = "Ошибка загрузки";
+    }
 }
 
 setTheme(localStorage.getItem("theme") || "dark");
