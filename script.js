@@ -4,6 +4,7 @@ const REPO = "Radmin-Call";
 let allReleases = [];
 let expanded = false;
 let expandedDescriptions = new Set(); // отслеживаем раскрытые описания
+let currentlyOpenDescription = null; // отслеживаем текущее открытое описание
 
 const toggleBtn = document.getElementById("themeToggle");
 
@@ -26,13 +27,45 @@ toggleBtn.onclick = () => {
     setTheme(isLight ? "dark" : "light");
 };
 
-function toggleDescription(releaseId) {
-    if (expandedDescriptions.has(releaseId)) {
-        expandedDescriptions.delete(releaseId);
-    } else {
-        expandedDescriptions.add(releaseId);
+function closeCurrentlyOpenDescription() {
+    if (currentlyOpenDescription !== null) {
+        const prevDescription = document.querySelector(`.description[data-id="${currentlyOpenDescription}"]`);
+        const prevBtn = document.querySelector(`.details-btn[data-id="${currentlyOpenDescription}"]`);
+        
+        if (prevDescription) {
+            prevDescription.classList.remove('expanded');
+        }
+        if (prevBtn) {
+            prevBtn.innerHTML = 'подробнее ▼';
+        }
+        
+        expandedDescriptions.delete(currentlyOpenDescription);
     }
-    render();
+}
+
+function toggleDescription(releaseId) {
+    const descriptionElement = document.querySelector(`.description[data-id="${releaseId}"]`);
+    const detailsBtn = document.querySelector(`.details-btn[data-id="${releaseId}"]`);
+    
+    if (!descriptionElement) return;
+    
+    // Если кликаем на уже открытое описание - просто закрываем его
+    if (currentlyOpenDescription === releaseId) {
+        closeCurrentlyOpenDescription();
+        currentlyOpenDescription = null;
+        return;
+    }
+    
+    // Закрываем предыдущее открытое описание
+    closeCurrentlyOpenDescription();
+    
+    // Открываем новое описание
+    descriptionElement.classList.add('expanded');
+    if (detailsBtn) {
+        detailsBtn.innerHTML = 'скрыть ▲';
+    }
+    expandedDescriptions.add(releaseId);
+    currentlyOpenDescription = releaseId;
 }
 
 function render() {
@@ -81,11 +114,11 @@ function render() {
                     }
                 </div>
                 
-                <div class="details-btn" onclick="toggleDescription(${releaseId})">
+                <div class="details-btn" data-id="${releaseId}" onclick="toggleDescription(${releaseId})">
                     ${isDescriptionExpanded ? 'скрыть ▲' : 'подробнее ▼'}
                 </div>
                 
-                <div class="description ${isDescriptionExpanded ? 'expanded' : ''}">
+                <div class="description ${isDescriptionExpanded ? 'expanded' : ''}" data-id="${releaseId}">
                     ${displayDescription}
                 </div>
             </div>
@@ -103,10 +136,21 @@ function render() {
     }
 
     app.innerHTML = html;
+    
+    // Восстанавливаем состояние currentlyOpenDescription после перерисовки
+    if (currentlyOpenDescription !== null) {
+        const openDescription = document.querySelector(`.description[data-id="${currentlyOpenDescription}"]`);
+        if (openDescription) {
+            openDescription.classList.add('expanded');
+        }
+    }
 }
 
 function toggle() {
     expanded = !expanded;
+    // Сбрасываем открытое описание при сворачивании/разворачивании списка
+    currentlyOpenDescription = null;
+    expandedDescriptions.clear();
     render();
 }
 
