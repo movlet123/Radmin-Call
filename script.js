@@ -3,6 +3,7 @@ const REPO = "Radmin-Call";
 
 let allReleases = [];
 let expanded = false;
+let expandedDescriptions = new Set(); // отслеживаем раскрытые описания
 
 const toggleBtn = document.getElementById("themeToggle");
 
@@ -25,16 +26,39 @@ toggleBtn.onclick = () => {
     setTheme(isLight ? "dark" : "light");
 };
 
+function toggleDescription(releaseId) {
+    if (expandedDescriptions.has(releaseId)) {
+        expandedDescriptions.delete(releaseId);
+    } else {
+        expandedDescriptions.add(releaseId);
+    }
+    render();
+}
+
 function render() {
     const app = document.getElementById("app");
 
-    // ✅ ВАЖНО: 4 по умолчанию
+    // ВАЖНО: 4 по умолчанию
     const visible = expanded ? allReleases : allReleases.slice(0, 4);
 
     let html = "";
 
     visible.forEach((r, i) => {
         const zip = r.assets?.find(a => a.name.endsWith(".zip"));
+        const releaseId = r.id;
+        const isDescriptionExpanded = expandedDescriptions.has(releaseId);
+        
+        // Получаем описание из поля "Describe this release" в GitHub
+        const description = r.body || "";
+        
+        // Если описание пустое или только пробелы
+        let displayDescription;
+        if (!description || description.trim() === "") {
+            displayDescription = "Описание пустое";
+        } else {
+            // Заменяем переносы строк на <br> для HTML
+            displayDescription = description.replace(/\n/g, '<br>');
+        }
 
         const isLastHidden =
             !expanded &&
@@ -45,19 +69,31 @@ function render() {
 
         html += `
         <div class="${cls}">
-            <div>
-                <div class="card-date">${new Date(r.published_at).toLocaleDateString()}</div>
-                <div class="card-title">${r.tag_name}</div>
+            <div class="card-content">
+                <div class="card-header">
+                    <div>
+                        <div class="card-date">${new Date(r.published_at).toLocaleDateString()}</div>
+                        <div class="card-title">${r.tag_name}</div>
+                    </div>
+                    ${zip 
+                        ? `<a href="${zip.browser_download_url}" class="download-btn">СКАЧАТЬ</a>` 
+                        : `<div class="no-file">Нет файла</div>`
+                    }
+                </div>
+                
+                <div class="details-btn" onclick="toggleDescription(${releaseId})">
+                    ${isDescriptionExpanded ? 'скрыть ▲' : 'подробнее ▼'}
+                </div>
+                
+                <div class="description ${isDescriptionExpanded ? 'expanded' : ''}">
+                    ${displayDescription}
+                </div>
             </div>
-            ${zip 
-                ? `<a href="${zip.browser_download_url}" class="download-btn">СКАЧАТЬ</a>` 
-                : `<div>Нет файла</div>`
-            }
         </div>
         `;
     });
 
-    // ✅ КНОПКА РАЗВЕРНУТЬ / ЗАКРЫТЬ
+    // КНОПКА РАЗВЕРНУТЬ / ЗАКРЫТЬ
     if (allReleases.length > 4) {
         html += `
         <div class="toggle-btn" onclick="toggle()">
@@ -88,6 +124,10 @@ async function load() {
         document.getElementById("app").innerHTML = "Ошибка загрузки";
     }
 }
+
+// Делаем функции глобально доступными для onclick
+window.toggleDescription = toggleDescription;
+window.toggle = toggle;
 
 setTheme(localStorage.getItem("theme") || "dark");
 setTimeout(load, 300);
