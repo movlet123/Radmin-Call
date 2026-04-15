@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
 /* ============================================
    БАЗОВЫЕ СТИЛИ С ЭФФЕКТОМ СМЕНЫ ТЕМЫ
@@ -510,9 +510,9 @@ body.light .description.expanded::-webkit-scrollbar-thumb {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
 }
 
-/* При наведении на луну в тёмной теме */
+/* При наведении на луну в тёмной теме — только цвет, без увеличения */
 .theme-toggle:hover .moon-icon {
-    color: #000000 !important;
+    color: #cccccc !important;  /* Светло-серый вместо чёрного (чтобы было видно на тёмном фоне) */
 }
 
 /* Светлая тема */
@@ -527,12 +527,13 @@ body.light .description.expanded::-webkit-scrollbar-thumb {
     color: #666666;
 }
 
-/* При наведении на луну в светлой теме */
+/* При наведении на луну в светлой теме — только цвет */
 .theme-toggle.light:hover .moon-icon {
     color: #000000 !important;
 }
 
-/* Увеличение при наведении */
+/* УБИРАЕМ УВЕЛИЧЕНИЕ — ЭТИ БЛОКИ ЗАКОММЕНТИРОВАНЫ ИЛИ УДАЛЕНЫ */
+/* 
 .theme-toggle:hover .sun-icon {
     transform: scale(1.1);
 }
@@ -544,20 +545,7 @@ body.light .description.expanded::-webkit-scrollbar-thumb {
 .theme-toggle.light:hover .moon-icon {
     transform: rotate(0deg) scale(1.1);
 }
-
-/* ============================================
-   АНИМАЦИИ
-   ============================================ */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+*/
 
 /* ============================================
    АДАПТИВ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
