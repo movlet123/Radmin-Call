@@ -36,7 +36,7 @@ function closeCurrentlyOpenDescription() {
             prevDescription.classList.remove('expanded');
         }
         if (prevBtn) {
-            prevBtn.innerHTML = 'подробнее ▼';
+            prevBtn.innerHTML = 'more details ▼';
         }
         
         expandedDescriptions.delete(currentlyOpenDescription);
@@ -62,7 +62,7 @@ function toggleDescription(releaseId) {
     // Открываем новое описание
     descriptionElement.classList.add('expanded');
     if (detailsBtn) {
-        detailsBtn.innerHTML = 'скрыть ▲';
+        detailsBtn.innerHTML = 'hide ▲';
     }
     expandedDescriptions.add(releaseId);
     currentlyOpenDescription = releaseId;
@@ -87,7 +87,7 @@ function render() {
         // Если описание пустое или только пробелы
         let displayDescription;
         if (!description || description.trim() === "") {
-            displayDescription = "Описание пустое";
+            displayDescription = "Description is empty";
         } else {
             // Заменяем переносы строк на <br> для HTML
             displayDescription = description.replace(/\n/g, '<br>');
@@ -109,13 +109,13 @@ function render() {
                         <div class="card-title">${r.tag_name}</div>
                     </div>
                     ${zip 
-                        ? `<a href="${zip.browser_download_url}" class="download-btn">СКАЧАТЬ</a>` 
-                        : `<div class="no-file">Нет файла</div>`
+                        ? `<a href="${zip.browser_download_url}" class="download-btn">DOWNLOAD</a>` 
+                        : `<div class="no-file">No File</div>`
                     }
                 </div>
                 
                 <div class="details-btn" data-id="${releaseId}" onclick="toggleDescription(${releaseId})">
-                    ${isDescriptionExpanded ? 'скрыть ▲' : 'подробнее ▼'}
+                    ${isDescriptionExpanded ? 'hide ▲' : 'more details ▼'}
                 </div>
                 
                 <div class="description ${isDescriptionExpanded ? 'expanded' : ''}" data-id="${releaseId}">
@@ -130,7 +130,7 @@ function render() {
     if (allReleases.length > 4) {
         html += `
         <div class="toggle-btn" onclick="toggle()">
-            ${expanded ? "закрыть ↑" : "развернуть ↓"}
+            ${expanded ? "close ▲" : "expand ▼"}
         </div>
         `;
     }
@@ -165,7 +165,7 @@ async function load() {
         render();
     } catch (e) {
         console.error(e);
-        document.getElementById("app").innerHTML = "Ошибка загрузки";
+        document.getElementById("app").innerHTML = "Loading error";
     }
 }
 
