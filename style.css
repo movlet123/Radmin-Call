@@ -38,7 +38,7 @@ body.theme-transition::before {
 }
 
 body.light {
-    background: #ffffff;
+    background: #f1f1f1;
     color: #111;
 }
 
@@ -138,7 +138,7 @@ body.light .card {
 }
 
 body.light .card:hover {
-    border-color: #000;
+    border-color: #5900ff;
 }
 
 /* Затемнение последней скрытой карточки */
@@ -222,18 +222,23 @@ body.light .card.fade::after {
     user-select: none;
     padding: 5px 10px;
     margin-top: 0;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
     width: auto;
     max-width: 150px;
 }
 
 body.light .details-btn {
-    color: #000;
+    color: #333333;
 }
 
 .details-btn:hover {
     opacity: 0.8;
     transform: translateX(5px);
+}
+
+body.light .details-btn:hover {
+    color: #5900ff;
 }
 
 /* ============================================
@@ -277,8 +282,8 @@ body.light .description.expanded {
    КНОПКА "СКАЧАТЬ"
    ============================================ */
 .download-btn {
-    background: #00ff88;  /* Зеленый для темной темы */
-    color: #000;
+    background: #00ff88;
+    color: #000000;
     padding: 12px 24px;
     border-radius: 8px;
     text-decoration: none;
@@ -296,64 +301,21 @@ body.light .description.expanded {
     min-width: 125px;
 }
 
-/* СВЕТЛАЯ ТЕМА: Кнопка становится СЕРОЙ */
 body.light .download-btn {
-    background: #333333;  /* Темно-серый */
-    color: #ffffff;       /* Белый текст для контраста */
+    background: #5900ff;
+    color: #ffffff;
 }
 
-/* Ховер для темной темы (зеленый) */
 .download-btn:hover {
     background: #00cc6e;
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
 }
 
-/* СВЕТЛАЯ ТЕМА: Ховер становится ЧЕРНЫМ */
 body.light .download-btn:hover {
-    background: #000000;  /* Чисто черный */
+    background: #4900d1;
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Также меняем цвет текста в шапке */
-.header p {
-    color: #00ff88;
-    font-weight: 700;
-    font-size: 1rem;
-    margin: 0;
-    transition: color 0.3s ease;
-    text-align: left;
-}
-
-/* СВЕТЛАЯ ТЕМА: Подзаголовок становится ЧЕРНЫМ */
-body.light .header p {
-    color: #000000;
-}
-
-/* И для кнопки "Подробнее" в светлой теме */
-body.light .details-btn {
-    color: #333333;  /* Темно-серый вместо горчичного */
-}
-
-body.light .details-btn:hover {
-    color: #000000;  /* При наведении черный */
-}
-
-/* Ховер для карточек в светлой теме */
-body.light .card:hover {
-    border-color: #333333;  /* Серая рамка при наведении */
-}
-
-/* Ховер для социальных ссылок в светлой теме */
-body.light .social-link:hover {
-    border-color: #333333;
-    color: #333333;
-}
-
-/* Скроллбар для светлой темы */
-body.light .description.expanded::-webkit-scrollbar-thumb {
-    background: #333333;  /* Серый скроллбар */
+    box-shadow: 0 0 15px rgba(68, 0, 255, 0.2);
 }
 
 /* ============================================
@@ -368,37 +330,18 @@ body.light .description.expanded::-webkit-scrollbar-thumb {
     user-select: none;
     position: relative;
     z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .toggle-btn:hover {
     color: #00ff88;
 }
 
-/* СВЕТЛАЯ ТЕМА: Кнопка "Развернуть" становится ЧЕРНОЙ при наведении */
 body.light .toggle-btn:hover {
     color: #000000;
-}
-
-/* ============================================
-   КНОПКА "РАЗВЕРНУТЬ/ЗАКРЫТЬ"
-   ============================================ */
-.toggle-btn {
-    text-align: center;
-    cursor: pointer;
-    color: #aaa;
-    margin-top: 10px;
-    transition: color 0.2s;
-    user-select: none;
-    position: relative;
-    z-index: 2;
-}
-
-.toggle-btn:hover {
-    color: #00ff88;
-}
-
-body.light .toggle-btn:hover {
-    color: #000;
 }
 
 /* ============================================
@@ -418,7 +361,7 @@ body.light .toggle-btn:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     width: 130px;
     color: #888;
     text-decoration: none;
@@ -435,8 +378,10 @@ body.light .social-link {
     border: 1px solid #ccc;
 }
 
-.social-link img {
+.social-link .link-icon {
     width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .social-link:hover {
@@ -445,8 +390,8 @@ body.light .social-link {
 }
 
 body.light .social-link:hover {
-    border-color: #000;
-    color: #000;
+    border-color: #5900ff;
+    color: #5900ff;
 }
 
 /* ============================================
@@ -510,9 +455,8 @@ body.light .description.expanded::-webkit-scrollbar-thumb {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
 }
 
-/* При наведении на луну в тёмной теме — только цвет, без увеличения */
 .theme-toggle:hover .moon-icon {
-    color: #cccccc !important;  /* Светло-серый вместо чёрного (чтобы было видно на тёмном фоне) */
+    color: #cccccc !important;
 }
 
 /* Светлая тема */
@@ -527,25 +471,9 @@ body.light .description.expanded::-webkit-scrollbar-thumb {
     color: #666666;
 }
 
-/* При наведении на луну в светлой теме — только цвет */
 .theme-toggle.light:hover .moon-icon {
     color: #000000 !important;
 }
-
-/* УБИРАЕМ УВЕЛИЧЕНИЕ — ЭТИ БЛОКИ ЗАКОММЕНТИРОВАНЫ ИЛИ УДАЛЕНЫ */
-/* 
-.theme-toggle:hover .sun-icon {
-    transform: scale(1.1);
-}
-
-.theme-toggle:hover .moon-icon {
-    transform: scale(1.1);
-}
-
-.theme-toggle.light:hover .moon-icon {
-    transform: rotate(0deg) scale(1.1);
-}
-*/
 
 /* ============================================
    АДАПТИВ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
